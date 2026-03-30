@@ -439,10 +439,17 @@ class _CallSupportScreenState extends State<CallSupportScreen>
 
   Widget _ticketCard(SupportTicketModel ticket) {
     final bool open = ticket.status.toLowerCase() == 'open';
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: CustomComponetCard(
-        child: Column(
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          AppRoutes.ticketDetailsScreen,
+          arguments: {'ticket': ticket},
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: CustomComponetCard(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -512,6 +519,7 @@ class _CallSupportScreenState extends State<CallSupportScreen>
               ],
             ),
           ],
+        ),
         ),
       ),
     );

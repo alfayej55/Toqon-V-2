@@ -28,6 +28,7 @@ import 'package:car_care/views/screen/Home/home_screen.dart';
 import 'package:car_care/views/screen/Profile/profile_screen.dart';
 import 'package:car_care/views/screen/Wallet/wallet_screen.dart';
 import '../views/Setting/call_support.dart';
+import '../views/screen/Support/ticket_details_screen.dart';
 import '../views/screen/Auth/forgot_email.screen.dart';
 import '../views/screen/Auth/forgot_password_screen.dart';
 import '../views/screen/Auth/otp_screen.dart';
@@ -91,6 +92,7 @@ class AppRoutes {
   static String messageInboxScreen = "/messageInbox_screen";
   static String feedBackScreen = "/feedBack_screen";
   static String myActivityScreen = "/myActivity_screen";
+  static String ticketDetailsScreen = "/ticketDetails_screen";
 
   static List<GetPage> page = [
     // Auth Pages
@@ -338,6 +340,12 @@ class AppRoutes {
     GetPage(
       name: myActivityScreen,
       page: () => MyActivityScreen(),
+      transition: Transition.rightToLeft,
+      transitionDuration: const Duration(milliseconds: 100),
+    ),
+    GetPage(
+      name: ticketDetailsScreen,
+      page: () => const TicketDetailsScreen(),
       transition: Transition.rightToLeft,
       transitionDuration: const Duration(milliseconds: 100),
     ),

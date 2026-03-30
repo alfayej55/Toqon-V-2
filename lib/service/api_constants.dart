@@ -89,6 +89,7 @@ class ApiConstants {
 
   static const String supportTicketsEndPoint = '/support-tickets';
   static const String sendEmailEndPoint = '/contact-support';
+  static String ticketRepliesEndPoint(String ticketId) => '/support-tickets/$ticketId/replies';
 
   /// Wallet
 

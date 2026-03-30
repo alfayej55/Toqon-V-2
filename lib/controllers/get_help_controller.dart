@@ -1,5 +1,6 @@
 import 'package:car_care/all_export.dart';
 import 'package:car_care/models/support_ticket_model.dart';
+import 'package:car_care/models/ticket_reply_model.dart';
 import 'package:car_care/service/api_constants.dart';
 import 'package:car_care/service/dio_api_client.dart';
 import 'package:flutter/material.dart';
@@ -20,10 +21,15 @@ class GetHelpController extends GetxController {
   TextEditingController ticketSubjectCtrl = TextEditingController();
   TextEditingController ticketMessageCtrl = TextEditingController();
 
+  /// Reply Controller
+  TextEditingController replyMessageCtrl = TextEditingController();
+
   /// Loading States
   var sendEmailLoading = false.obs;
   var creatingTicket = false.obs;
   var loadingTickets = false.obs;
+  var repliesLoading = false.obs;
+  var sendingReply = false.obs;
 
   /// Ticket Priority & Filter
   var selectedTicketPriority = 'medium'.obs;
@@ -31,6 +37,9 @@ class GetHelpController extends GetxController {
 
   /// Tickets List
   RxList<SupportTicketModel> tickets = <SupportTicketModel>[].obs;
+
+  /// Ticket Replies
+  RxList<TicketReplyModel> ticketReplies = <TicketReplyModel>[].obs;
 
   /// Filtered Tickets
   List<SupportTicketModel> get filteredTickets {
@@ -139,6 +148,61 @@ class GetHelpController extends GetxController {
     }
   }
 
+  /// Get Ticket Replies Function
+  Future<void> getTicketReplies(String ticketId) async {
+    repliesLoading.value = true;
+    ticketReplies.clear();
+
+    try {
+      final response = await _apiClient.getData(
+        ApiConstants.ticketRepliesEndPoint(ticketId),
+      );
+
+      if (response.isSuccess) {
+        final List<dynamic> repliesData =
+            response.data['data']['attributes']['results'];
+        ticketReplies.value = repliesData
+            .map((reply) =>
+                TicketReplyModel.fromJson(reply as Map<String, dynamic>))
+            .toList();
+      }
+    } catch (e) {
+      debugPrint('Get Ticket Replies Error: $e');
+    } finally {
+      repliesLoading.value = false;
+    }
+  }
+
+  /// Send Ticket Reply Function
+  Future<void> sendTicketReply(String ticketId) async {
+    if (replyMessageCtrl.text.trim().isEmpty) return;
+
+    sendingReply.value = true;
+
+    try {
+      var body = {
+        "message": replyMessageCtrl.text.trim(),
+      };
+
+      final response = await _apiClient.postData(
+        ApiConstants.ticketRepliesEndPoint(ticketId),
+        data: body,
+      );
+
+      if (response.isSuccess) {
+        replyMessageCtrl.clear();
+        getTicketReplies(ticketId);
+      } else {
+        Get.snackbar('Error', response.message);
+      }
+    } catch (e) {
+      debugPrint('Send Reply Error: $e');
+      Get.snackbar('Error', 'Something went wrong. Please try again.');
+    } finally {
+      sendingReply.value = false;
+    }
+  }
+
   /// Start Live Chat
   void startLiveChat() {
     Get.toNamed(AppRoutes.chatScreen);
@@ -165,6 +229,7 @@ class GetHelpController extends GetxController {
     emailMessageCtrl.dispose();
     ticketSubjectCtrl.dispose();
     ticketMessageCtrl.dispose();
+    replyMessageCtrl.dispose();
     super.onClose();
   }
 }
