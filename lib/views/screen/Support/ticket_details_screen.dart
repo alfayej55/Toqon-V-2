@@ -173,6 +173,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                     child: CustomTextField(
                       hintText: 'Write your reply...',
                       contenpaddingHorizontal: 14,
+                      textStyle: TextStyle(color: Colors.black),
                       contenpaddingVertical: 12,
                       maxLines: null,
                       minLines: 1,
@@ -249,7 +250,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    reply.senderName ?? 'Support Team',
+                    reply.user?.email ?? 'Support Team',
                     style: AppStyles.h6(
                       color: AppColors.primaryColor,
                       fontFamily: 'InterSemiBold',

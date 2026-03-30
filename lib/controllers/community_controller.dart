@@ -3,7 +3,6 @@ import 'package:car_care/models/profile_model.dart';
 import 'package:car_care/models/comment_model.dart';
 import 'package:car_care/models/garage_offer_model.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:car_care/controllers/profile_controller.dart';
 
 import '../models/community_model.dart';
@@ -14,13 +13,10 @@ class CommunityController extends GetxController {
   CommunityController();
 
   final ApiClient _apiClient = Get.put(ApiClient());
-  final SharedPreferences _sharedPreferences = Get.find<SharedPreferences>();
   final ProfileController _profileCtrl =
       Get.isRegistered<ProfileController>()
           ? Get.find<ProfileController>()
           : Get.put(ProfileController());
-
-  static const String _savedPostsPrefKey = 'community_saved_posts_v1';
 
   TextEditingController titleTextCtrl = TextEditingController();
   TextEditingController descriptionTextCtrl = TextEditingController();
@@ -49,8 +45,6 @@ class CommunityController extends GetxController {
   RxList<GarageOfferModel> garageOfferList = <GarageOfferModel>[].obs;
   RxList<CommentModel> commentList = <CommentModel>[].obs;
 
-  final RxSet<String> savedPostIds = <String>{}.obs;
-
   DateTime? selectedDateObject;
 
   final List<String> feedFilters = const [
@@ -66,7 +60,6 @@ class CommunityController extends GetxController {
 
   @override
   void onInit() {
-    _loadSavedPosts();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await getCommunity();
     });
@@ -109,7 +102,7 @@ class CommunityController extends GetxController {
         list.sort((a, b) => _trendingScore(b).compareTo(_trendingScore(a)));
         break;
       case 'Saved':
-        list = list.where((post) => savedPostIds.contains(post.id)).toList();
+        list = list.where((post) => post.isSaved).toList();
         break;
       case 'Garages':
         list =
@@ -162,25 +155,6 @@ class CommunityController extends GetxController {
 
   void setSearchQuery(String value) {
     searchQuery.value = value;
-  }
-
-  Future<void> _loadSavedPosts() async {
-    final List<String> ids =
-        _sharedPreferences.getStringList(_savedPostsPrefKey) ?? <String>[];
-    savedPostIds.addAll(ids);
-  }
-
-  Future<void> _persistSavedPosts() async {
-    await _sharedPreferences.setStringList(
-      _savedPostsPrefKey,
-      savedPostIds.toList(),
-    );
-  }
-
-  void _applyLocalFlags(List<CommunityModel> list) {
-    for (final post in list) {
-      post.isSaved = savedPostIds.contains(post.id);
-    }
   }
 
   void _updatePostInBothLists(
@@ -326,7 +300,6 @@ class CommunityController extends GetxController {
             (x) => CommunityModel.fromJson(x),
           ),
         );
-        _applyLocalFlags(posts);
         communityList.value = posts;
       } else {
         // INJECT DUMMY DATA FOR TESTING SINCE TOKEN IS FAKE
@@ -438,7 +411,6 @@ class CommunityController extends GetxController {
             (x) => CommunityModel.fromJson(x),
           ),
         );
-        _applyLocalFlags(posts);
         myPostList.value = posts;
       }
     } catch (e) {
@@ -470,27 +442,18 @@ class CommunityController extends GetxController {
   }
 
   Future<void> toggleSavePost(String id) async {
-    final bool wasSaved = savedPostIds.contains(id);
-
-    if (wasSaved) {
-      savedPostIds.remove(id);
-    } else {
-      savedPostIds.add(id);
-    }
-
-    await _persistSavedPosts();
-
-    _updatePostInBothLists(id, (post) {
-      post.isSaved = !wasSaved;
-    });
-
     try {
-      await _apiClient.postData(
+      final response = await _apiClient.postData(
         ApiConstants.saveCommunityEndPoint(id),
-        data: {'saved': !wasSaved},
       );
-    } catch (_) {
-      // Keep local state for now. Backend endpoint may not exist yet.
+      if (response.isSuccess) {
+        _updatePostInBothLists(id, (post) {
+          post.isSaved = !post.isSaved;
+        });
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to save post: $e');
+      debugPrint('Save Post Error: $e');
     }
   }
 

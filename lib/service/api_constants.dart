@@ -59,7 +59,7 @@ class ApiConstants {
   static String likeCommunityEndPoint(String id) => '/community/$id/like';
   static String commentCommunityEndPoint(String id) =>
       '/community/$id/comments';
-  static String saveCommunityEndPoint(String id) => '/community/$id/save';
+  static String saveCommunityEndPoint(String id) => '/community/$id/favorite';
   static String solvedCommunityEndPoint(String id) => '/community/$id/solve';
 
   /// Service and Category
@@ -89,7 +89,7 @@ class ApiConstants {
 
   static const String supportTicketsEndPoint = '/support-tickets';
   static const String sendEmailEndPoint = '/contact-support';
-  static String ticketRepliesEndPoint(String ticketId) => '/support-tickets/$ticketId/replies';
+  static String ticketRepliesEndPoint(String ticketId) => '/support-tickets/$ticketId/reply';
 
   /// Wallet
 

@@ -148,19 +148,19 @@ class GetHelpController extends GetxController {
     }
   }
 
-  /// Get Ticket Replies Function
+  /// Get Ticket Details with Replies Function
   Future<void> getTicketReplies(String ticketId) async {
     repliesLoading.value = true;
     ticketReplies.clear();
 
     try {
       final response = await _apiClient.getData(
-        ApiConstants.ticketRepliesEndPoint(ticketId),
+        '${ApiConstants.supportTicketsEndPoint}/$ticketId',
       );
 
       if (response.isSuccess) {
         final List<dynamic> repliesData =
-            response.data['data']['attributes']['results'];
+            response.data['data']['attributes']['replies'] ?? [];
         ticketReplies.value = repliesData
             .map((reply) =>
                 TicketReplyModel.fromJson(reply as Map<String, dynamic>))
@@ -191,7 +191,12 @@ class GetHelpController extends GetxController {
 
       if (response.isSuccess) {
         replyMessageCtrl.clear();
-        getTicketReplies(ticketId);
+        final List<dynamic> repliesData =
+            response.data['data']['attributes']['replies'] ?? [];
+        ticketReplies.value = repliesData
+            .map((reply) =>
+                TicketReplyModel.fromJson(reply as Map<String, dynamic>))
+            .toList();
       } else {
         Get.snackbar('Error', response.message);
       }
