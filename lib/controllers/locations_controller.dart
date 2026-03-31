@@ -21,12 +21,12 @@ class LocationController extends GetxController{
   Rx<LatLng> currentLocation = LatLng(23.803292583341523, 90.415693934826).obs;
   var locationLoading = true.obs;
 
-  @override
-  void onInit() {
-    getCurrentLocation();
-    getGarage();
-    super.onInit();
-  }
+  // @override
+  // void onInit() {
+  //   getCurrentLocation();
+  //   getGarage();
+  //   super.onInit();
+  // }
 
   RxList<Marker> markerList = <Marker>[].obs;
 
@@ -76,6 +76,7 @@ class LocationController extends GetxController{
   var garageLoading = false.obs;
   RxList<ProfileModel> garageList=<ProfileModel>[].obs;
   getGarage()async{
+    print('Garage Show>>>>>>>>>');
     garageLoading(true);
     try {
       // API Call

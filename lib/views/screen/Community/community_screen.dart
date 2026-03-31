@@ -129,7 +129,7 @@ class CommunityScreen extends StatelessWidget {
         Expanded(
           child: Text(
             'Torqon Community',
-            style: AppStyles.h2(
+            style: AppStyles.h5(
               fontFamily: 'InterBold',
               color:
                   Get.isDarkMode

@@ -155,6 +155,7 @@ class _CallSupportScreenState extends State<CallSupportScreen>
               const SizedBox(height: 6),
               CustomTextField(
                 controller: _ctrl.emailSubjectCtrl,
+                textStyle: TextStyle(color: Colors.black),
                 hintText: 'e.g. Payment not reflected',
                 contenpaddingVertical: 12,
               ),
@@ -163,6 +164,7 @@ class _CallSupportScreenState extends State<CallSupportScreen>
               const SizedBox(height: 6),
               CustomTextField(
                 controller: _ctrl.emailMessageCtrl,
+                textStyle: TextStyle(color: Colors.black),
                 hintText: 'Please describe your issue...',
                 maxLines: null,
                 minLines: 4,
@@ -202,6 +204,7 @@ class _CallSupportScreenState extends State<CallSupportScreen>
                   const SizedBox(height: 10),
                   CustomTextField(
                     controller: _ctrl.ticketSubjectCtrl,
+                    textStyle: TextStyle(color: Colors.black),
                     hintText: 'Ticket subject',
                     contenpaddingVertical: 12,
                   ),
@@ -218,6 +221,7 @@ class _CallSupportScreenState extends State<CallSupportScreen>
                   const SizedBox(height: 10),
                   CustomTextField(
                     controller: _ctrl.ticketMessageCtrl,
+                    textStyle: TextStyle(color: Colors.black),
                     hintText: 'Describe your issue in detail',
                     maxLines: null,
                     minLines: 3,

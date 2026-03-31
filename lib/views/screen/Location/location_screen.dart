@@ -42,6 +42,8 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
+    _locationCtrl. getCurrentLocation();
+    _locationCtrl. getGarage();
     // Listen for location changes and animate camera
     ever(_locationCtrl.currentLocation, (LatLng location) {
       if (_mapController != null) {
