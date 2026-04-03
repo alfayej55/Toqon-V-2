@@ -1161,13 +1161,14 @@ class _WalletScreenState extends State<WalletScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Wallet Recharge', style: AppStyles.h3()),
+                Text('Add Funds', style: AppStyles.h3()),
                 const SizedBox(height: 8),
                 Text('How much do you want to add?', style: AppStyles.h5()),
                 const SizedBox(height: 12),
                 CustomTextField(
                   keyboardType: TextInputType.number,
                   controller: _walletCtrl.amountTextCtrl,
+                  textStyle: TextStyle(color: Get.theme.textTheme.bodyLarge!.color),
                   contenpaddingHorizontal: 14,
                   contenpaddingVertical: 13,
                   hintText: 'Enter amount',

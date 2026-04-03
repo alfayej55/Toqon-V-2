@@ -10,6 +10,7 @@ class CustomDialog extends StatelessWidget {
   final String message;
   final String? confirmText;
   final String? cancelText;
+  final String? icon;
   final Function() onConfirm;
   final VoidCallback? onCancel;
 
@@ -19,6 +20,7 @@ class CustomDialog extends StatelessWidget {
     required this.message,
     this.confirmText = 'Continue',
     this.cancelText = 'Close',
+    this.icon,
     required this.onConfirm,
     this.onCancel,
   });
@@ -50,40 +52,35 @@ class CustomDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(11),
-                      gradient: const LinearGradient(
-                        colors: AppColors.brandGradient,
-                      ),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        AppIcons.worningIcon,
-                        width: 18,
-                        height: 18,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: const LinearGradient(
+                    colors: AppColors.brandGradient,
+                  ),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    icon ?? AppIcons.worningIcon,
+                    width: 24,
+                    height: 24,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: AppStyles.h3(
-                        color: isDark ? Colors.white : AppColors.textColor,
-                        fontFamily: 'InterSemiBold',
-                      ),
-                    ),
-                  ),
-                ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: AppStyles.h3(
+                  color: isDark ? Colors.white : AppColors.textColor,
+                  fontFamily: 'InterSemiBold',
+                ),
               ),
               const SizedBox(height: 10),
               Text(

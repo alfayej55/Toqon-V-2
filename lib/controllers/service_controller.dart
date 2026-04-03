@@ -294,6 +294,31 @@ class ServiceController extends GetxController {
     }
   }
 
+  /// Service Details
+
+  var serviceDetailsLoading = false.obs;
+  Rx<ServiceModel> serviceDetails = ServiceModel.fromJson({}).obs;
+
+  Future<void> getServiceDetails(String serviceId) async {
+    serviceDetailsLoading.value = true;
+
+    try {
+      // API Call
+      final response = await _apiClient.getData(ApiConstants.serviceDetailsEndPoint(serviceId));
+      // Handle response
+      if (response.isSuccess) {
+        final serviceData = response.data['data']['attributes'];
+        serviceDetails.value = ServiceModel.fromJson(serviceData as Map<String, dynamic>);
+      } else {
+        Get.snackbar('Error', response.message);
+      }
+    } catch (e) {
+      debugPrint('Failed to fetch service details: $e');
+      Get.snackbar('Error', 'Something went wrong. Please try again.');
+    } finally {
+      serviceDetailsLoading.value = false;
+    }
+  }
 
 
   /// Get Profile Info

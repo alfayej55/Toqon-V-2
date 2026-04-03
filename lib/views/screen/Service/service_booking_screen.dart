@@ -1,5 +1,6 @@
 import 'package:car_care/views/base/custom_button.dart';
 import 'package:car_care/views/base/custom_page_loading.dart';
+import 'package:car_care/views/base/worning_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:car_care/all_export.dart';
 
@@ -45,6 +46,7 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
     debugPrint('Typeeee>>$type');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _serviceCtrl.getVehicles();
+      _serviceCtrl.getServiceDetails(serviceId);
     });
   }
 
@@ -60,7 +62,7 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
               SizedBox(height: 20),
 
               /// Garage Card
-              _garageCard(context),
+              _serviceDetailsCard(context),
 
               SizedBox(height: 10),
 
@@ -146,44 +148,6 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
                     }).toList(),
               ),
 
-              // /// Your Info Section
-              //
-              // SizedBox(height: 20),
-              // Text(
-              //   AppString.yourInfoText,
-              //   style: AppStyles.h3(fontFamily: 'InterSemiBold'),
-              // ),
-              // SizedBox(height: 15),
-              // Text(
-              //   AppString.fullNameText,
-              //   style: AppStyles.h5(
-              //   ),
-              //   maxLines: 2,
-              //   overflow: TextOverflow.ellipsis,
-              // ),
-              // SizedBox(height: Dimensions.heightSize,),
-              // CustomTextField(
-              //   controller:_serviceCtrl.nameTextCtrl,
-              //   hintText:'Name',
-              //   contenpaddingVertical: 10,
-              // ),
-              //
-              // /// Nurber
-              // SizedBox(height: 10),
-              // Text(
-              //   AppString.phoneNumberText,
-              //   style: AppStyles.h5(
-              //   ),
-              //   maxLines: 2,
-              //   overflow: TextOverflow.ellipsis,
-              // ),
-              // SizedBox(height: Dimensions.heightSize,),
-              // CustomTextField(
-              //   controller:_serviceCtrl.phoneTextCtrl,
-              //   hintText:'Phone Number',
-              //   keyboardType: TextInputType.phone,
-              //   contenpaddingVertical: 10,
-              // ),
 
               /// Vehicle
               SizedBox(height: 10),
@@ -241,9 +205,24 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
               CustomButton(
                 loading: _serviceCtrl.bookingLoading.value,
                 onTap: () {
-                  _serviceCtrl.createBooking(
-                    bookingType: type,
-                    serviceID: serviceId,
+                  final servicePrice =
+                      _serviceCtrl.serviceDetails.value.servicePrice;
+                  Get.dialog(
+                    CustomDialog(
+                      title: 'Confirm Payment',
+                      icon: AppIcons.walletIcon,
+                      message:
+                          'This amount \$$servicePrice will be deducted from your wallet. Do you want to proceed?',
+                      confirmText: 'Confirm',
+                      cancelText: 'Cancel',
+                      onConfirm: () {
+                        Get.back();
+                        _serviceCtrl.createBooking(
+                          bookingType: type,
+                          serviceID: serviceId,
+                        );
+                      },
+                    ),
                   );
                 },
                 text: 'Confirm Booking',
@@ -255,62 +234,88 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
     );
   }
 
-  Widget _garageCard(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Get.theme.cardColor,
-        border: Border.all(
-          color: AppColors.borderColor.withValues(alpha: 0.2),
-          width: 1,
-        ),
-        boxShadow: [AppStyles.boxShadow],
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
+  Widget _serviceDetailsCard(BuildContext context) {
+    final service = _serviceCtrl.serviceDetails.value;
+    final garageName = service.serviceprovider?.fullName ??
+                       service.garageProfile?.fullName ??
+                       'Unknown Garage';
+
+    return _serviceCtrl.serviceDetailsLoading.value
+        ? CustomPageLoading()
+        : Container(
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Get.theme.cardColor,
+              border: Border.all(
+                color: AppColors.borderColor.withValues(alpha: 0.2),
+                width: 1,
+              ),
+              boxShadow: [AppStyles.boxShadow],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Oil Change',
-                      style: AppStyles.h4(fontFamily: 'InterSemiBold'),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            service.serviceName.isNotEmpty
+                                ? service.serviceName
+                                : 'Service Name',
+                            style: AppStyles.h4(fontFamily: 'InterSemiBold'),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            garageName,
+                            style: AppStyles.h5(fontFamily: 'InterSemiBold'),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Estimated duration: ${service.serviceDuration} minutes',
+                            style: AppStyles.h6(fontFamily: 'InterSemiBold'),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Jay’s Smart Garage',
-                      style: AppStyles.h5(fontFamily: 'InterSemiBold'),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Estimated duration: 30 minutes',
-                      style: AppStyles.h6(fontFamily: 'InterSemiBold'),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        '\$${service.servicePrice}',
+                        style: AppStyles.h6(
+                          color: Colors.white,
+                          fontFamily: 'InterBold',
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor, // Green for "Open Now"
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Text(
-                  '\$150',
-                  style: AppStyles.h6(
-                    color: Colors.white,
-                    fontFamily: 'InterBold',
+                if (service.serviceDetails.isNotEmpty) ...[
+                  SizedBox(height: 10),
+                  Text(
+                    'Description',
+                    style: AppStyles.h5(fontFamily: 'InterSemiBold'),
                   ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+                  SizedBox(height: 4),
+                  Text(
+                    service.serviceDetails,
+                    style: AppStyles.h6(
+                      color: Get.theme.textTheme.bodyMedium!.color,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          );
   }
 }

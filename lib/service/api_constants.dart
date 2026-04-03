@@ -66,6 +66,7 @@ class ApiConstants {
 
   static String categoryEndPoint = '/categories/nearby';
   static String serviceEndPoint = '/services/nearby';
+  static String serviceDetailsEndPoint(String id) => '/services/$id';
   static String garageEndPoint = '/garages';
   static String nearbyGarageEndPoint = '/users/nearby-garages/map';
   static String homeGarageProfileEndPoint = '/users/nearby-garages';
